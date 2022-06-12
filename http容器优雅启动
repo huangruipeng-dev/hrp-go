@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: http-deployment
+spec:
+ selector:
+   matchLabels:
+     app: http
+   replicas: 2
+ template: 
+   metadata:
+     labels:
+       app: http
+ spec:
+   restartPolicy: Always
+   containers:
+   - name: http
+     image: fmeng.azurecr.io/httpserver:1.0
+     imagePullPolicy: IfNotPresent
+     ports:
+     - containerPort: 80
+    readinessProbe:   
+      httpGet:      
+        path: /healthz      
+        port: 8080      
+        scheme: HTTP    
+      initialDelaySeconds: 5    
+      periodSeconds: 3
