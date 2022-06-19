@@ -1,0 +1,64 @@
+一、优雅启动
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpserver
+  labels:
+    app: httpserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpserver
+   template:
+     metadata:
+       labels:
+         app: httpserver
+     spec:
+       containers:
+       - name: httpserver
+         image: httpserver:1.0
+         imagePullPolicy: IfNotPresent
+         ports:
+         - containerPort: 8080
+         livenessProbe:
+           httpGet:
+             path: /healthz
+             scheme: HTTP
+           initialDelaySeconds: 15
+           periodSeconds: 20
+         readinessProbe:
+           exc:
+             command:
+             - cat
+             - /tmp/healthy
+           initialDelaySeconds: 5
+           periodSeconds: 5
+         resources:
+           limits:
+             cpu: 200m
+             memory: 100Mi
+           requests:
+             cpu: 20m
+             menory: 20Mi
+       restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpserver
+  labels:
+    app: httpserver
+spec:
+  port:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: httpserver
+  type: ClusterIP
+           
+         
+        
+  
